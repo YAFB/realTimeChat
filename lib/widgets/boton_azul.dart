@@ -13,10 +13,27 @@ class BotonAzul extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
-      onPressed: onPressed,
-      style: const ButtonStyle(
-        backgroundColor: WidgetStatePropertyAll(Colors.blue),
+      style: ButtonStyle(
+        backgroundColor: WidgetStateProperty.resolveWith<Color>(
+          (Set<WidgetState> states) {
+            if (states.contains(WidgetState.disabled)) {
+              return Colors.grey; // Color cuando el botón está deshabilitado
+            }
+            return Colors.blue; // Color cuando el botón está habilitado
+          },
+        ),
+        foregroundColor: WidgetStateProperty.resolveWith<Color>(
+          (Set<WidgetState> states) {
+            if (states.contains(WidgetState.disabled)) {
+              return Colors
+                  .black; // Color del texto cuando el botón está deshabilitado
+            }
+            return Colors
+                .white; // Color del texto cuando el botón está habilitado
+          },
+        ),
       ),
+      onPressed: onPressed,
       child: SizedBox(
         width: double.infinity,
         child: Text(

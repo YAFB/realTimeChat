@@ -1,5 +1,7 @@
 import 'package:chat_app/models/usuario.dart';
+import 'package:chat_app/services/auth_service.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class UsuariosPage extends StatefulWidget {
   const UsuariosPage({super.key});
@@ -15,18 +17,20 @@ class _UsuariosPageState extends State<UsuariosPage> {
     Usuario(online: true, email: "test3@test.com", nombre: "Jose", uid: "3"),
   ];
 
-  // final RefreshController _refreshController =
-  //     RefreshController(initialRefresh: false);
-
   @override
   Widget build(BuildContext context) {
+    final authService = Provider.of<AuthService>(context);
+    final Usuario usuario = authService.usuario!;
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: const Text("User name"),
+        title: Text(usuario.nombre),
         backgroundColor: Colors.white,
         leading: IconButton(
-          onPressed: () {},
+          onPressed: () {
+            AuthService.deleteToken();
+            Navigator.of(context).pushReplacementNamed('login');
+          },
           icon: const Icon(Icons.exit_to_app),
         ),
         actions: [
@@ -53,14 +57,14 @@ class _UsuariosPageState extends State<UsuariosPage> {
 
   ListTile _usuarioListTile(Usuario usuario) {
     return ListTile(
-      title: Text(usuario.nombre!),
-      subtitle: Text(usuario.email!),
+      title: Text(usuario.nombre),
+      subtitle: Text(usuario.email),
       leading: CircleAvatar(
-        child: Text(usuario.nombre!.substring(0, 2)),
+        child: Text(usuario.nombre.substring(0, 2)),
       ),
       trailing: Icon(
         Icons.circle,
-        color: usuario.online! ? Colors.green[300] : Colors.red,
+        color: usuario.online ? Colors.green[300] : Colors.red,
         size: 10,
       ),
     );
@@ -68,6 +72,6 @@ class _UsuariosPageState extends State<UsuariosPage> {
 
   Future<void> _cargarUsuarios() async {
     // monitor network fetch
-    await Future.delayed(Duration(milliseconds: 1000));
+    await Future.delayed(const Duration(milliseconds: 1000));
   }
 }

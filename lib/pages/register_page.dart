@@ -1,8 +1,11 @@
+import 'package:chat_app/helper/alert.dart';
+import 'package:chat_app/services/auth_service.dart';
 import 'package:chat_app/widgets/boton_azul.dart';
 import 'package:chat_app/widgets/custome_input.dart';
 import 'package:chat_app/widgets/labels.dart';
 import 'package:chat_app/widgets/logo.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class RegisterPage extends StatelessWidget {
   const RegisterPage({super.key});
@@ -52,6 +55,7 @@ class _FormState extends State<_Form> {
   final TextEditingController _passwordController = TextEditingController();
   @override
   Widget build(BuildContext context) {
+    final authService = Provider.of<AuthService>(context);
     return Container(
       margin: const EdgeInsets.only(top: 40),
       padding: const EdgeInsets.symmetric(horizontal: 30),
@@ -88,10 +92,32 @@ class _FormState extends State<_Form> {
           const SizedBox(height: 25),
           BotonAzul(
             textButton: "Registrar",
-            onPressed: () {
-              print(_emailController.text);
-              print(_passwordController.text);
-            },
+            onPressed: authService.autenticando
+                ? null
+                : () async {
+                    final Map<String, dynamic> response =
+                        await authService.register(
+                      nombre: _nameController.text,
+                      email: _emailController.text.trim(),
+                      password: _passwordController.text.trim(),
+                    );
+
+                    if (response["ok"]) {
+                      _nameController.clear();
+                      _emailController.clear();
+                      _passwordController.clear();
+                      mostrarAlert(
+                          context: context,
+                          mensaje: "Usuario registrado correctamente",
+                          color: Colors.blue[400]!);
+                      Navigator.of(context).pushReplacementNamed('usuarios');
+                    } else {
+                      mostrarAlert(
+                          context: context,
+                          mensaje: response["msg"],
+                          color: Colors.red[700]!);
+                    }
+                  },
           )
         ],
       ),
